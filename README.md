@@ -2,6 +2,7 @@
 An extremely basic visual simulation of the genetic algorithm.
 In order to survive, the tadpoles must learn how to avoid dangerous obstacles over generations and reach their goal.
 
+<img alt="Genetic algorithm simulator" src="https://raw.githubusercontent.com/ananttuli/genetic-algo-simulator/main/images/screenshot.png?token=ABHZ5CSECS6LAJ23KYX5BO3AHESKK" width="auto" height="350px">
 
 
 ## Run locally in your browser
