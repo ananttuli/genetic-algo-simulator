@@ -1,13 +1,20 @@
 import config from './config.js';
 
-
+/**
+ * * Scale X coordinate according to width of environment,
+ * * Round to closes integer as per MDN's recommendation for canvas
+ * @param {number} val Value of X coordinate
+ */
 function scaleX(val) {
-    // Round as per MDN recommendation for canvas
     return Math.round((val/100) * config.WIDTH);
 }
 
+/**
+ * * Scale Y coordinate according to height of environment,
+ * * Round to closes integer as per MDN's recommendation for canvas
+ * @param {number} val Value of Y coordinate
+ */
 function scaleY(val) {
-    // Round as per MDN recommendation for canvas
     return Math.round((val/100) * config.HEIGHT);
 }
 
@@ -74,8 +81,6 @@ export function renderTickManager(gameInstance) {
                 ctx.fillRect(scaleX(tadpole.position[0]), scaleY(tadpole.position[1]), 8, 8);
             }
         });
-
-        // ctx.save();
 
         // Generation info
         let statsEl = document.getElementById('statsEl');
