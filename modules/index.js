@@ -1,5 +1,6 @@
 import Game from './Game.js';
 
+// Limit scope, prevents variables leaking out of script
 (function() {
     /** @type Game | null */
     let game = null;
@@ -32,7 +33,7 @@ import Game from './Game.js';
             playPauseButton.innerText = game.isPaused ? 'Play' : 'Pause';
         } 
 
-        initializeNewGame();
+        initializeNewGame();        
     }
 
 })();

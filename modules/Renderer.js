@@ -1,5 +1,16 @@
 import config from './config.js';
 
+
+function scaleX(val) {
+    // Round as per MDN recommendation for canvas
+    return Math.round((val/100) * config.WIDTH);
+}
+
+function scaleY(val) {
+    // Round as per MDN recommendation for canvas
+    return Math.round((val/100) * config.HEIGHT);
+}
+
 /**
  * Manages render loops for the game
  * @param {Game | null} game 
@@ -34,42 +45,50 @@ export function renderTickManager(gameInstance) {
     function renderTick() {
         let deadCount = 0, rewardCount = 0;
 
-        game.environment.tadpoles.forEach((tadpole, i) => {
-            let existingEl = document.getElementById(`tadpole${i}`);
-            if (!existingEl) {
-                existingEl = document.createElement('div');
-                existingEl.setAttribute('id', `tadpole${i}`);
-                existingEl.className = 'tadpole';
-                document.getElementById('environment').appendChild(existingEl);
-                existingEl.classList.add('tadpole');
-            }
+        const elId = 'environment-fg-layer';
+        let canvasFg = document.getElementById(elId);
 
-            existingEl.style.top = ((tadpole.position[1] / 100) * config.HEIGHT) + 'px';
-            existingEl.style.left = ((tadpole.position[0] / 100) * config.WIDTH) + 'px';
+        if(!canvasFg) {
+            canvasFg = document.createElement('canvas');
+            canvasFg.setAttribute('height', config.HEIGHT);
+            canvasFg.setAttribute('width', config.WIDTH);
+            canvasFg.setAttribute('id', elId);
+            document.getElementById('environment').appendChild(canvasFg);
+        }
 
-            if (tadpole.isDead) {
-                deadCount++;
-                existingEl.classList.add('dead');
-            } else existingEl.classList.remove('dead');
+        let ctx = canvasFg.getContext('2d');
+        ctx.clearRect(0, 0, config.WIDTH, config.HEIGHT);
 
-            if (tadpole.rewarded) {
+        game.environment.tadpoles.forEach((tadpole) => {
+            if(tadpole.rewarded) {
                 rewardCount++;
-                existingEl.classList.add('rewarded');
-            } else existingEl.classList.remove('rewarded');
-
-            // Generation info
-            let statsEl = document.getElementById('statsEl');
-            if (!statsEl) {
-                statsEl = document.createElement('DIV');
-                statsEl.className = 'generation';
-                statsEl.setAttribute('id', 'statsEl');
-                document.body.appendChild(statsEl);
+                ctx.fillStyle = 'green';
+                ctx.fillRect(scaleX(tadpole.position[0]), scaleY(tadpole.position[1]), 8, 8);
+                
+            } else if(tadpole.isDead) {
+                deadCount++;
+                ctx.fillStyle = 'red';
+                ctx.fillRect(scaleX(tadpole.position[0]), scaleY(tadpole.position[1]), 8, 8);
+            } else {
+                ctx.fillStyle = 'gray';
+                ctx.fillRect(scaleX(tadpole.position[0]), scaleY(tadpole.position[1]), 8, 8);
             }
-            statsEl.innerText = `Generation: ${game.environment.generation}` +
-                `| Alive:   ${game.environment.tadpoles.length - deadCount}/ ${game.environment.tadpoles.length}` +
-                ` | Survivors: ${rewardCount}`;
         });
 
+        // ctx.save();
+
+        // Generation info
+        let statsEl = document.getElementById('statsEl');
+        if (!statsEl) {
+            statsEl = document.createElement('DIV');
+            statsEl.className = 'generation';
+            statsEl.setAttribute('id', 'statsEl');
+            document.body.appendChild(statsEl);
+        }
+        statsEl.innerText = `Generation: ${game.environment.generation}` +
+            `| Alive:   ${game.environment.tadpoles.length - deadCount}/ ${game.environment.tadpoles.length}` +
+            ` | Survivors: ${rewardCount}`;
+        
         continueLoopIfUnpaused();
     }
 
@@ -78,36 +97,56 @@ export function renderTickManager(gameInstance) {
     };
 }
 
-
 export function renderEnvironment(reward, obstacles) {
-    const canvas = document.getElementById('environment') || document.createElement('div');
-    canvas.className = 'environment';
-    canvas.setAttribute('id', 'environment');
-    canvas.style.width = `${config.WIDTH}px`;
-    canvas.style.height = `${config.HEIGHT}px`;
-    document.body.prepend(canvas);
+    const envEl = document.getElementById('environment');
+    
+    envEl.style.width = `${config.WIDTH + 25}px`;
+    envEl.style.height = `${config.HEIGHT + 25}px`;
+    
+    const elId = 'environment-bg-layer';
 
-    // Insert reward
-    const rewardEl = document.createElement('div');
-    rewardEl.style.left = ((reward[0] / 100) * config.WIDTH) + 'px';
-    rewardEl.style.top = ((reward[1] / 100) * config.HEIGHT) + 'px';
-    rewardEl.className = 'reward';
-    document.getElementById('environment').appendChild(rewardEl);
+    let backgroundCanvas = document.getElementById(elId);
 
+    if(!backgroundCanvas) {
+        backgroundCanvas = document.createElement('canvas');
+        backgroundCanvas.setAttribute('width', config.WIDTH);
+        backgroundCanvas.setAttribute('id', elId);
+        backgroundCanvas.setAttribute('height', config.HEIGHT);
+        document.getElementById('environment').prepend(backgroundCanvas);
+    }
+    
+    const ctx = backgroundCanvas.getContext('2d');
 
-    // Insert obstacles
-    obstacles.forEach((obstacle) => {
-        const obEl = document.createElement('div');
-        obEl.style.left = ((obstacle[0] / 100) * config.WIDTH) + 'px';
-        obEl.style.top = ((obstacle[1] / 100) * config.HEIGHT) + 'px';
-        obEl.className = 'obstacle';
-        document.getElementById('environment').appendChild(obEl);
-    });
+    // Clear canvas
+    ctx.clearRect(0, 0, config.WIDTH, config.HEIGHT);
+
+    // Background color i.e. water
+    ctx.fillStyle = 'lightblue';
+    ctx.fillRect(0, 0, config.WIDTH, config.HEIGHT);
+
+    const rewardImg = new Image();
+    /* Flag sprite source: https://opengameart.org/content/flag-animation-mod */
+    rewardImg.src = 'images/flag.gif';
+
+    rewardImg.onload = () => {
+        ctx.drawImage(rewardImg, scaleX(reward[0]), scaleY(reward[1]));
+    }
+
+    const obstacleImg = new Image();
+    /* Flag sprite source: https://opengameart.org/content/octopus */
+    obstacleImg.src = 'images/octo_small.png';
+    obstacleImg.onload = () => {
+        obstacles.forEach((obstacle) => {
+            ctx.drawImage(obstacleImg, scaleX(obstacle[0]), scaleY(obstacle[1]));
+        });
+    }
+
 }
 
 export function removeEnvironment() {
-    const canvas = document.getElementById('environment');
-    if(canvas) {
-        canvas.parentElement.removeChild(canvas);
-    }
+    const canvasBg = document.getElementById('environment-bg-layer');
+    const canvasFg = document.getElementById('environment-fg-layer');
+
+    canvasBg && canvasBg.parentElement.removeChild(canvasBg);
+    canvasFg && canvasFg.parentElement.removeChild(canvasFg);
 }

@@ -6,7 +6,8 @@ import config from './config.js';
 export default class Tadpole {
 
     constructor(rewardCoords, obstacles) {
-        this.position = [config.STARTING_COORDS[0] + Math.random() * 1, config.STARTING_COORDS[1] + Math.random() * 1];
+        // Add a minor random factor to the starting coordinates
+        this.position = [config.STARTING_COORDS[0] + Math.random() * 2, config.STARTING_COORDS[1] + Math.random() * 2];
         this.brain = new Brain(config.MAX_STEPS);
         this.isDead = false;
         this.rewarded = false;
