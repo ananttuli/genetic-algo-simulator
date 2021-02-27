@@ -50,4 +50,11 @@
 
 .controls {
     display: flex;
+    padding: 0.5rem;
+    font-size: 1em;
+}
+
+.controls button {
+    padding: 0.25rem;
+    margin: 0.25rem;
 }

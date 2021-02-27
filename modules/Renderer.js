@@ -58,14 +58,14 @@ export function renderTickManager(gameInstance) {
             } else existingEl.classList.remove('rewarded');
 
             // Generation info
-            let generationEl = document.getElementById('generationEl');
-            if (!generationEl) {
-                generationEl = document.createElement('DIV');
-                generationEl.className = 'generation';
-                generationEl.setAttribute('id', 'generationEl');
-                document.body.appendChild(generationEl);
+            let statsEl = document.getElementById('statsEl');
+            if (!statsEl) {
+                statsEl = document.createElement('DIV');
+                statsEl.className = 'generation';
+                statsEl.setAttribute('id', 'statsEl');
+                document.body.appendChild(statsEl);
             }
-            generationEl.innerText = `Generation: ${game.environment.generation}` +
+            statsEl.innerText = `Generation: ${game.environment.generation}` +
                 `| Alive:   ${game.environment.tadpoles.length - deadCount}/ ${game.environment.tadpoles.length}` +
                 ` | Survivors: ${rewardCount}`;
         });
