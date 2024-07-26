@@ -18,3 +18,5 @@ In order to survive, the tadpoles must learn how to avoid dangerous obstacles ov
 ## Built with
 * Pure Javascript (no framework)
 * HTML5 (Canvas)
+
+<img src="https://github.com/ananttuli/genetic-algo-simulator/blob/main/images/screenshot.png" width="500" />
